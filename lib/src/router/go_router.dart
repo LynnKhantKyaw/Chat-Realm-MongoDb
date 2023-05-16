@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:test_realm/src/feature/auth/presentation/login.dart';
-import 'package:test_realm/src/feature/chat/chat.dart';
+import 'package:test_realm/src/feature/chat/presentation/chat.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 

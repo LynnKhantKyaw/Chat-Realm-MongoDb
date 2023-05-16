@@ -6,10 +6,15 @@ import 'package:test_realm/src/feature/auth/presentation/login.dart';
 import 'package:test_realm/src/feature/chat/domain/model.dart';
 import 'package:test_realm/src/router/go_router.dart';
 
+final newRealmProvider = StateProvider<Realm?>((ref) {
+  return null;
+});
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final container = ProviderContainer();
   SharedPreferences prefs = await SharedPreferences.getInstance();
+
   runApp(
     UncontrolledProviderScope(
       container: container,

@@ -5,6 +5,10 @@ import 'package:test_realm/src/constant/atlas_app_id.dart';
 import 'package:test_realm/src/feature/auth/presentation/login.dart';
 import 'package:test_realm/src/feature/chat/domain/message_model.dart';
 
+final queryProvider = StateProvider<String>((ref) {
+  return '';
+});
+
 class Chat extends ConsumerStatefulWidget {
   const Chat({super.key});
 
@@ -26,7 +30,9 @@ class _ChatState extends ConsumerState<Chat> {
     realm.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(realm.all<MessageModel>());
     });
+    //  realmResults = realm.query<MessageModel>(r'message == $0', [_query]);
     realmResults = realm.all<MessageModel>();
+    print('object');
     setState(() {});
   }
 
@@ -36,15 +42,36 @@ class _ChatState extends ConsumerState<Chat> {
     super.initState();
   }
 
+  final controller = TextEditingController();
+  String _query = '';
+
   @override
   Widget build(BuildContext context) {
     final username = ref.watch(userNameProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Za Developer Group'),
       ),
       body: Column(
         children: [
+          TextField(
+            decoration: const InputDecoration(
+                border: OutlineInputBorder(), isDense: true),
+            controller: controller,
+            onChanged: (value) {
+              _query = value;
+
+              // setState(() {});
+              if (_query.isNotEmpty) {
+                realmResults =
+                    realm.query<MessageModel>(r'message == $0', [_query]);
+              } else {
+                realmResults = realm.all<MessageModel>();
+              }
+              setState(() {});
+            },
+          ),
           Expanded(
             child: StreamBuilder(
                 stream: realmResults.changes,
@@ -79,16 +106,14 @@ class _ChatState extends ConsumerState<Chat> {
           ),
         ],
       ),
-      // bottomNavigationBar: MessageSendWidget(
-      //   messageController: messageController,
-      //   sendOnTap: () {
-      //     _sendMessage(username: username ?? '');
-      //   },
-      // ),
     );
   }
 
-  void _sendMessage({required String username}) {
+  void _sendMessage({required String username}) async {
+    final query = realm.query<MessageModel>(r'message == $0', ['Hi']);
+    for (var i in query) {
+      print(i.message);
+    }
     if (messageController.text.isNotEmpty) {
       realm.write(() => realm.add(MessageModel(
             ObjectId(),
@@ -99,7 +124,7 @@ class _ChatState extends ConsumerState<Chat> {
     }
   }
 
-  void _deleteMessage({required MessageModel messageModel}) {
+  void _deleteMessage({required MessageModel messageModel}) async {
     realm.write(() => realm.delete(messageModel));
     Navigator.pop(context);
   }
